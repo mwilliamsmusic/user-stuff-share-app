@@ -6,31 +6,39 @@ using user_stuff_share_app.Dtos.Basic_Req_Res_Dtos.Req;
 using user_stuff_share_app.Dtos.Basic_Req_Res_Dtos.Res;
 using user_stuff_share_app.Dtos.Item.Tag_Item_Dtos;
 using user_stuff_share_app.Repository_Interfaces.ITag_Repository;
+using user_stuff_share_app.Status_Messages;
 
 namespace user_stuff_share_app.Controllers.Tag_Controllers
 {
-    [Route("tag/item/collect")]
+    [Route("user/tag/item/")]
     [Authorize]
     [ApiController]
     public class TagItemController : ControllerBase
     {
         private readonly ITagItemRepository tagRepo;
-        public TagItemController(ITagItemRepository tagRepo)
+        private readonly StatusMessages _statusMessage;
+        public TagItemController(ITagItemRepository tagRepo, StatusMessages statusMessaage)
         {
             this.tagRepo = tagRepo;
+            _statusMessage = statusMessaage;
+
         }
 
 
 
             [HttpPost("ait")]
-            public async Task<IActionResult> AddItemTag([FromBody] ReqAddTagItemHandler reqAddTagHandler)
+            public async Task<IActionResult> AddItemTag([FromBody] ReqAddTagItemHandler reqAddTagItemHandler)
             {
-                if (reqAddTagHandler == null)
+                if (reqAddTagItemHandler == null)
                 {
                     return BadRequest();
                 }
-
-            bool addTags = await tagRepo.AddItemTagHandler(reqAddTagHandler);
+            bool check = await tagRepo.CheckItemTagJoin(reqAddTagItemHandler);
+            if (check)
+            {
+                return Conflict(_statusMessage.TagJoinCheck());
+            }
+            bool addTags = await tagRepo.AddItemTagHandler(reqAddTagItemHandler);
                 if (!addTags)
                 {
                     return BadRequest();
@@ -42,7 +50,6 @@ namespace user_stuff_share_app.Controllers.Tag_Controllers
         [HttpPost("git")]
         public async Task<IActionResult> GetItemTag([FromBody] ReqItemId reqItemId)
         {
-
             if (reqItemId == null)
             {
                 return BadRequest();
@@ -58,15 +65,14 @@ namespace user_stuff_share_app.Controllers.Tag_Controllers
 
 
         [HttpPost("rit")]
-        public async Task<IActionResult> RemoveItemTag([FromBody]ReqId reqId)
+        public async Task<IActionResult> RemoveItemTag([FromBody] ReqRemoveItemTag reqRemoveItemTag)
         {
-
-            if (reqId == null)
+            if (reqRemoveItemTag == null)
             {
                 return BadRequest();
             }
 
-            bool getCollectTags = await tagRepo.RemoveItemTagJoin( reqId);
+            bool getCollectTags = await tagRepo.RemoveItemTagJoin(reqRemoveItemTag);
             if (!getCollectTags)
             {
                 return BadRequest();

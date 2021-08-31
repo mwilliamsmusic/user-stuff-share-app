@@ -15,10 +15,9 @@ using user_stuff_share_app.Repository_Interfaces.ICool_Repository;
 
 namespace user_stuff_share_app.Controllers.Collect_Controllers
 {
-    [Route("user/item/collect")]
+    [Route("user/item/")]
     [ApiController]
     [Authorize]
-  
     public class ItemController : ControllerBase
     {
         private readonly IItemRepository _itemRepo;
@@ -53,10 +52,8 @@ namespace user_stuff_share_app.Controllers.Collect_Controllers
             ResId createCool = await _coolItemRepo.CreateCoolItem(reqCreateCool);
             if (createCool == null)
             {
-                
                 return StatusCode(500);
             }
-
 
             ReqCreateCoolItemJoin reqCreateCoolJoin = new ReqCreateCoolItemJoin() { UserId = reqCreateItem.UserId, CoolItemId = createCool.Id, ItemId=createdItem.Id };
             bool coolJoin = await _coolItemRepo.AddCoolUser(reqCreateCoolJoin);
@@ -64,11 +61,7 @@ namespace user_stuff_share_app.Controllers.Collect_Controllers
             {
                 return StatusCode(500);
             }
-
-
-
             return Ok(createdItem);
-          
         }
 
         [HttpPost("one")]
@@ -88,11 +81,9 @@ namespace user_stuff_share_app.Controllers.Collect_Controllers
             return Ok(resGet);
         }
 
-
         [HttpPost("all")]
         public async Task<IActionResult> GetAllItems([FromBody] ReqCollectId reqCollectId)
         {
-     
                 IEnumerable<ResGetItem> items = await _itemRepo.GetAllItems(reqCollectId);
                 if (items == null)
                 {
@@ -119,16 +110,16 @@ namespace user_stuff_share_app.Controllers.Collect_Controllers
                 return NoContent();
         }
 
-        [HttpDelete("di")]
-        public async Task<IActionResult> DeleteItem([FromBody] ReqId reqId)
+        [HttpPost("di")]
+        public async Task<IActionResult> DeleteItem([FromBody] ReqIdUserId reqIdUserId)
         {
-            if (reqId == null)
+            if (reqIdUserId == null)
             {
                 return NotFound();
             }
 
-
-           bool deletedItem = await _itemRepo.DeleteItemCollect(reqId);
+            reqIdUserId.UserId = _userInfo.IdClaim(User);
+            bool deletedItem = await _itemRepo.DeleteItemCollect(reqIdUserId);
 
                 if (!deletedItem)
                 {
@@ -159,8 +150,5 @@ namespace user_stuff_share_app.Controllers.Collect_Controllers
                 return StatusCode(500);
             }
         }
-
-
-
     }
 }

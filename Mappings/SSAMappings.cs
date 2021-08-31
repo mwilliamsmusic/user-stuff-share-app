@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using ssa_database.Models.Collect_Models;
 using ssa_database.Models.Cool_Models;
+using ssa_database.Models.Tag_Models;
 using ssa_database.Models.User_Models;
+using user_stuff_share_app.Dtos.Basic_Req_Res_Dtos.Res;
 using user_stuff_share_app.Dtos.Collect.Collect_Dtos.Create_Collect;
 using user_stuff_share_app.Dtos.Collect.Collect_Dtos.Get_Collect;
 using user_stuff_share_app.Dtos.Collect.Cool_Collect_Dtos.Create_Cool_Collect;
@@ -24,7 +26,8 @@ namespace user_stuff_share_app.Mappings
             CreateMap<Collect, ReqCreateCollect>().ReverseMap();
            // CreateMap<Collect, ReqDeleteCollect>().ReverseMap();
          //   CreateMap<Collect, ResGetCollectByUsername>().ReverseMap();
-            // Item Collect
+
+            // Item
             CreateMap<Item, ResGetCollect>().ReverseMap();
             CreateMap<Item, ReqCreateItem>().ReverseMap();
             CreateMap<Item, ResGetItem>().ReverseMap();
@@ -33,20 +36,17 @@ namespace user_stuff_share_app.Mappings
 
             // Cool
             CreateMap<CoolCollect, ReqCreateCoolCollect>().ReverseMap();
+           
             CreateMap<CoolCollectJoin, ReqCreateCoolJoin>().ReverseMap();
             CreateMap<CoolItem, ReqCreateCoolItem>().ReverseMap();
             CreateMap<CoolItemJoin, ReqCreateCoolItemJoin>().ReverseMap();
 
             // Follow
             CreateMap<FollowUser, ReqFollowUser>().ReverseMap();
-            // Tags
-          //  CreateMap<ReqPostTag, Tag>().ReverseMap();
-          //  CreateMap<ReqPostTag, TagCollectJoin>().ReverseMap();
-          //  CreateMap<TagItemJoin, ResGetItemTags>().ReverseMap();
-           // CreateMap<TagCollectJoin, ResGetCollectTags>().ReverseMap();
-          //  CreateMap<TagItemCollectJoin, ReqRemoveItemCollectTag>().ReverseMap();
-          
 
+            // Tags
+            CreateMap<TagCollectJoin, ResTagId>().ReverseMap();
+            CreateMap<TagItemJoin, ResTagId>().ReverseMap();
 
         }
     }

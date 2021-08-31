@@ -10,6 +10,7 @@ namespace user_stuff_share_app.Repository_Interfaces.ITag_Repository
     {
         Task<IEnumerable<ResTagId>> GetItemTags(ReqItemId reqItemId);
         Task<bool> AddItemTagHandler(ReqAddTagItemHandler reqAddTagHandler);
-        Task<bool> RemoveItemTagJoin(ReqId reqId);
+        Task<bool> RemoveItemTagJoin(ReqRemoveItemTag reqRemoveItemTag);
+        Task<bool> CheckItemTagJoin(ReqAddTagItemHandler reqAddTagItemHandler);
     }
 }

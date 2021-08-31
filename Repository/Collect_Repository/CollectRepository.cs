@@ -73,8 +73,8 @@ namespace user_stuff_share_app.Repository.Collect_Repository
         
         public async Task<bool> DeleteCollect(ReqIdUserId reqIdUserId)
         {
-                Collect deleteCollect = _mapper.Map<Collect>(reqIdUserId);
-                _db.Collect.Remove(deleteCollect);
+            Collect collectQuery = await _db.Collect.AsNoTracking().FirstOrDefaultAsync(c => c.UserId == reqIdUserId.UserId && c.Id == reqIdUserId.Id);
+            _db.Collect.Remove(collectQuery);
             return await Save();
         }
      
@@ -128,9 +128,6 @@ namespace user_stuff_share_app.Repository.Collect_Repository
             mergedCollect.Created = collectQuery.Created;
             return mergedCollect;
         }
-        
-       
-
     }
 }
 

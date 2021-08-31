@@ -19,7 +19,7 @@ namespace user_stuff_share_app.Repository_Interfaces.ICollect_Repository
 
         Task<bool> UpdateItemCollect(ReqUpdateItem reqUpdate);
 
-        Task<bool> DeleteItemCollect(ReqId reqId);
+        Task<bool> DeleteItemCollect(ReqIdUserId reqIdUserId);
 
         Task<bool> Save();
 

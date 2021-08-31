@@ -27,7 +27,7 @@ namespace user_stuff_share_app.Repository.Tag_Repository
         public async Task<IEnumerable<ResTagId>> GetCollectTags(ReqCollectId reqCollectId)
         {
            IEnumerable<TagCollectJoin> collects = await dbJoin.TagCollectJoin.AsNoTracking().Where(c => c.CollectId == reqCollectId.CollectId)
-                 .OrderBy(c => c.TagId).ToListAsync();
+                 .OrderBy(c => c.TagName).ToListAsync();
             IEnumerable<ResTagId> res = mapper.Map<IEnumerable<ResTagId>>(collects);
             return res;
         }
@@ -42,7 +42,7 @@ namespace user_stuff_share_app.Repository.Tag_Repository
     
         private async Task<bool> AddTagCollect(ReqAddTagCollectHandler reqAddTagCollectHandler)
         {
-            Tag req = new Tag { Name = reqAddTagCollectHandler.TagId };
+            Tag req = new Tag { Name = reqAddTagCollectHandler.TagName };
           bool tag = await  dbTag.Tag.AsNoTracking().AnyAsync(t=> t.Name == req.Name);
             if (!tag)
             {
@@ -52,21 +52,25 @@ namespace user_stuff_share_app.Repository.Tag_Repository
             return true;
         }
         private async Task<bool> AddTagCollectJoin(ReqAddTagCollectHandler reqAddTagCollectHandler) {
-            TagCollectJoin tag = new TagCollectJoin { TagId = reqAddTagCollectHandler.TagId, CollectId = reqAddTagCollectHandler.CollectId };
+            TagCollectJoin tag = new TagCollectJoin { TagName = reqAddTagCollectHandler.TagName, CollectId = reqAddTagCollectHandler.CollectId };
             dbJoin.TagCollectJoin.Add(tag);
             return await SaveJoin();
         }
 
-      
-
-        public async Task<bool> RemoveTagCollectJoin(ReqId reqId) 
+        public async Task<bool> RemoveTagCollectJoin(ReqRemoveCollectTag reqRemoveCollectTag) 
         {
             TagCollectJoin tagJoin = await  dbJoin.TagCollectJoin
-                .FirstOrDefaultAsync(c => c.Id == reqId.Id);
+                .FirstOrDefaultAsync(c => c.CollectId == reqRemoveCollectTag.CollectId && c.TagName == reqRemoveCollectTag.TagName);
             dbJoin.TagCollectJoin.Remove(tagJoin);
 
             return await SaveJoin();
-        } 
+        }
+
+        public async Task<bool> CheckCollectTagJoin(ReqAddTagCollectHandler reqAddTagCollectHandler)
+        {
+            bool tag = await dbTag.TagCollectJoin.AsNoTracking().AnyAsync(t => t.CollectId == reqAddTagCollectHandler.CollectId && t.TagName == reqAddTagCollectHandler.TagName);
+            return tag;
+        }
 
         private async Task<bool> SaveTag()
         {

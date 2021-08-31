@@ -18,7 +18,6 @@ namespace user_stuff_share_app.Controllers
     [Route("user/collect/")]
     [ApiController]
     [Authorize]
-
     public class CollectController : ControllerBase
     {
         private readonly ICollectRepository collectRepo;

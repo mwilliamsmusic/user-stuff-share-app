@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using user_stuff_share_app.Dtos.Auth_Dtos;
 using user_stuff_share_app.Dtos.Reg_Dtos;
 using user_stuff_share_app.Repository_Interfaces.IUser_Repository;
+using user_stuff_share_app.Status_Messages;
 
 namespace user_stuff_share_app.Controllers
 {
@@ -15,10 +16,11 @@ namespace user_stuff_share_app.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepo;
-
-        public UserController(IUserRepository userRepo)
+        private readonly StatusMessages _statusMessages;
+        public UserController(IUserRepository userRepo, StatusMessages statusMessages )
         {
             _userRepo = userRepo;
+            _statusMessages = statusMessages;
         }
    
          [AllowAnonymous]
@@ -29,7 +31,7 @@ namespace user_stuff_share_app.Controllers
 
             if (user == null)
             {
-                return BadRequest(new { message = " Username or password is incorrect" });
+                return BadRequest(_statusMessages.IncorrectLogin());
             }
             Response.Cookies.Append("X-Access-Token", user.Token, new CookieOptions() { /*HttpOnly = true,*/
                 SameSite = SameSiteMode.None,
@@ -48,12 +50,12 @@ namespace user_stuff_share_app.Controllers
 
             if (!ifUsernameUnique)
             {
-                return BadRequest(new { message = "Username already exists" });
+                return BadRequest( _statusMessages.UsernameExists());
             }
             bool user = await  _userRepo.Register(regDtoReq);
             if (user == false)
             {
-                return BadRequest(new { message = "Error while registering" });
+                return BadRequest(_statusMessages.RegisterError());
             }
 
             return NoContent();

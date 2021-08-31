@@ -6,6 +6,7 @@ using user_stuff_share_app.Dtos.Basic_Req_Res_Dtos.Req;
 using user_stuff_share_app.Dtos.Basic_Req_Res_Dtos.Res;
 using user_stuff_share_app.Dtos.Collect.Tag_Collect_Dtos;
 using user_stuff_share_app.Repository_Interfaces.ITag_Repository;
+using user_stuff_share_app.Status_Messages;
 
 namespace user_stuff_share_app.Controllers.Tag_controllers
 {
@@ -15,9 +16,11 @@ namespace user_stuff_share_app.Controllers.Tag_controllers
     public class TagCollectController : ControllerBase
     {
         private readonly ITagCollectRepository tagRepo;
-        public TagCollectController(ITagCollectRepository tagRepo)
+        private readonly StatusMessages _statusMessages;
+        public TagCollectController(ITagCollectRepository tagRepo, StatusMessages statusMessaages)
         {
             this.tagRepo = tagRepo;
+            _statusMessages = statusMessaages;
         }
 
         [HttpPost("act")]
@@ -27,8 +30,12 @@ namespace user_stuff_share_app.Controllers.Tag_controllers
             {
                 return BadRequest();
             }
-            
-               bool addTags = await tagRepo.AddTagCollectHandler(reqAddTagCollectHandler);
+            bool check =await  tagRepo.CheckCollectTagJoin(reqAddTagCollectHandler);
+            if (check)
+            {
+                return Conflict(_statusMessages.TagJoinCheck());
+            }
+            bool addTags = await tagRepo.AddTagCollectHandler(reqAddTagCollectHandler);
             if (!addTags)
             {
                 return BadRequest();
@@ -54,16 +61,15 @@ namespace user_stuff_share_app.Controllers.Tag_controllers
         }
 
 
-        [HttpPost("rct")]
-        public async Task<IActionResult> RemoveCollectTag([FromBody] ReqId reqId)
+        [HttpPost("dct")]
+        public async Task<IActionResult> RemoveCollectTag([FromBody] ReqRemoveCollectTag reqRemoveCollectTag)
         {
-
-            if (reqId == null)
+            if (reqRemoveCollectTag == null)
             {
                 return BadRequest();
             }
 
-            bool getCollectTags = await tagRepo.RemoveTagCollectJoin(reqId);
+            bool getCollectTags = await tagRepo.RemoveTagCollectJoin(reqRemoveCollectTag);
             if (!getCollectTags)
             {
                 return BadRequest();
@@ -71,7 +77,4 @@ namespace user_stuff_share_app.Controllers.Tag_controllers
             return NoContent();
         }
     }
-    
- 
-
 }

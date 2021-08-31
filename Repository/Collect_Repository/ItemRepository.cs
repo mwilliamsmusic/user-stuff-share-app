@@ -68,9 +68,9 @@ namespace user_stuff_share_app.Repository.Collect_Repository
             return await Save();
         }
 
-        public async Task<bool> DeleteItemCollect(ReqId reqId)
+        public async Task<bool> DeleteItemCollect(ReqIdUserId reqIdUserId)
         {
-            Item deleteItem = _mapper.Map<Item>(reqId);
+            Item deleteItem = await  _db.Item.AsNoTracking().FirstOrDefaultAsync(c => c.UserId == reqIdUserId.UserId && c.Id == reqIdUserId.Id);
             _db.Item.Remove(deleteItem);
             return await Save();
         }
