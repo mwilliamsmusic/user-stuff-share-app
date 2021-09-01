@@ -45,8 +45,8 @@ namespace user_stuff_share_app.Mappings
             CreateMap<FollowUser, ReqFollowUser>().ReverseMap();
 
             // Tags
-            CreateMap<TagCollectJoin, ResTagId>().ReverseMap();
-            CreateMap<TagItemJoin, ResTagId>().ReverseMap();
+            CreateMap<TagCollectJoin, ResIdTagName>().ReverseMap();
+            CreateMap<TagItemJoin, ResIdTagName>().ReverseMap();
 
         }
     }

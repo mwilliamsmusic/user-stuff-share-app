@@ -13,73 +13,85 @@ namespace user_stuff_share_app.Repository.Tag_Repository
 {
     public class TagItemRepository: ITagItemRepository
     {
-        private readonly ApplicationDbContext dbJoin;
-        private readonly ApplicationDbContext dbTag;
-        private readonly IMapper mapper;
+        private readonly ApplicationDbContext _dbJoin;
+        private readonly ApplicationDbContext _dbTag;
+        private readonly ApplicationDbContext _dbItem;
+        private readonly IMapper _mapper;
 
-        public TagItemRepository(ApplicationDbContext dbTag, ApplicationDbContext dbJoin, IMapper mapper)
+        public TagItemRepository(ApplicationDbContext dbTag, ApplicationDbContext dbJoin, ApplicationDbContext dbItem, IMapper mapper)
         {
-            this.dbJoin = dbJoin;
-            this.dbTag = dbTag;
-            this.mapper = mapper;
+            _dbJoin = dbJoin;
+            _dbTag = dbTag;
+            _dbItem = dbItem;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ResTagId>> GetItemTags(ReqItemId reqItemId)
+        public async Task<IEnumerable<ResIdTagName>> GetItemTags(ReqItemId reqItemId)
         {
-            IEnumerable<TagItemJoin> items = await dbJoin.TagItemJoin.AsNoTracking().Where(c => c.ItemId == reqItemId.ItemId)
+            IEnumerable<TagItemJoin> items = await _dbJoin.TagItemJoin.AsNoTracking().Where(c => c.ItemId == reqItemId.ItemId)
                   .OrderBy(c => c.TagName).ToListAsync();
-            IEnumerable<ResTagId> res = mapper.Map<IEnumerable<ResTagId>>(items);
+            IEnumerable<ResIdTagName> res = _mapper.Map<IEnumerable<ResIdTagName>>(items);
             return res;
         }
 
-        public async Task<bool> AddItemTagHandler(ReqAddTagItemHandler reqAddTagHandler)
+        public async Task<ResIdTagName> AddItemTagHandler(ReqAddTagItemHandler reqAddTagHandler)
         {
-            bool tags = await AddItemTag(reqAddTagHandler);
-            bool joinTags = await AddItemTagJoin(reqAddTagHandler);
-
-            return tags && joinTags ? true : false; ;
+            bool tag = await AddItemTag(reqAddTagHandler);
+            if (tag)
+            {
+                ResIdTagName joinTag = await AddItemTagJoin(reqAddTagHandler);
+                return joinTag;
+            }
+            return null;
         }
         private async Task<bool> AddItemTag(ReqAddTagItemHandler reqAddTagHandler)
         {
             Tag req = new Tag { Name = reqAddTagHandler.TagName };
-            bool tag = await dbTag.Tag.AsNoTracking().AnyAsync(t => t.Name == req.Name);
+            bool tag = await _dbTag.Tag.AsNoTracking().AnyAsync(t => t.Name == req.Name);
             if (!tag)
             {
-                dbTag.Tag.Add(req);
+                _dbTag.Tag.Add(req);
                 return await SaveTag();
             }
             return true;
         }
-        private async Task<bool> AddItemTagJoin(ReqAddTagItemHandler reqAddTagHandler)
+        private async Task<ResIdTagName> AddItemTagJoin(ReqAddTagItemHandler reqAddTagHandler)
         {
             TagItemJoin tag = new TagItemJoin { ItemId = reqAddTagHandler.ItemId, TagName = reqAddTagHandler.TagName };
-            dbJoin.TagItemJoin.Add(tag);
-            return await SaveJoin();
+            _dbJoin.TagItemJoin.Add(tag);
+            await SaveJoin();
+            ResIdTagName res = new() { Id = tag.Id, TagName = tag.TagName };
+            return res;
         }
 
         public async Task<bool> RemoveItemTagJoin(ReqRemoveItemTag reqRemoveItemTag)
         {
-            TagItemJoin tagJoin = await dbJoin.TagItemJoin
-                .FirstOrDefaultAsync(c => c.ItemId == reqRemoveItemTag.ItemId && c.TagName == reqRemoveItemTag.TagName);
-            dbJoin.TagItemJoin.Remove(tagJoin);
+            TagItemJoin tagJoin = await _dbJoin.TagItemJoin
+                .FirstOrDefaultAsync(c => c.Id == reqRemoveItemTag.Id);
+            _dbJoin.TagItemJoin.Remove(tagJoin);
             return await SaveJoin();
         }
 
         public async Task<bool> CheckItemTagJoin(ReqAddTagItemHandler reqAddTagItemHandler)
         {
-            bool tag = await dbTag.TagItemJoin.AsNoTracking().AnyAsync(t => t.ItemId == reqAddTagItemHandler.ItemId && t.TagName == reqAddTagItemHandler.TagName);
+            bool tag = await _dbTag.TagItemJoin.AsNoTracking().AnyAsync(t => t.ItemId == reqAddTagItemHandler.ItemId && t.TagName == reqAddTagItemHandler.TagName);
             return tag;
         }
 
+        public async Task<bool> CheckUser(long id, long userId)
+        {
+            bool tag = await _dbItem.Item.AsNoTracking().AnyAsync(t => t.Id == id && t.UserId == userId);
+            return tag;
+        }
 
         private async Task<bool> SaveTag()
         {
-            return await dbTag.SaveChangesAsync() >= 0 ? true : false; ;
+            return await _dbTag.SaveChangesAsync() >= 0 ? true : false; ;
         }
 
         private async Task<bool> SaveJoin()
         {
-            return await dbJoin.SaveChangesAsync() >= 0 ? true : false; ;
+            return await _dbJoin.SaveChangesAsync() >= 0 ? true : false; ;
         }
     }
 }

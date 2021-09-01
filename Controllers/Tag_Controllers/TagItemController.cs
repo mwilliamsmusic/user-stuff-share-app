@@ -15,12 +15,14 @@ namespace user_stuff_share_app.Controllers.Tag_Controllers
     [ApiController]
     public class TagItemController : ControllerBase
     {
-        private readonly ITagItemRepository tagRepo;
+        private readonly ITagItemRepository _tagRepo;
         private readonly StatusMessages _statusMessage;
-        public TagItemController(ITagItemRepository tagRepo, StatusMessages statusMessaage)
+        private readonly UserInfo _userInfo;
+        public TagItemController(ITagItemRepository tagRepo, StatusMessages statusMessaage,UserInfo userInfo)
         {
-            this.tagRepo = tagRepo;
+           _tagRepo = tagRepo;
             _statusMessage = statusMessaage;
+            _userInfo = userInfo;
 
         }
 
@@ -33,17 +35,25 @@ namespace user_stuff_share_app.Controllers.Tag_Controllers
                 {
                     return BadRequest();
                 }
-            bool check = await tagRepo.CheckItemTagJoin(reqAddTagItemHandler);
-            if (check)
+            reqAddTagItemHandler.UserId = _userInfo.IdClaim(User);
+            bool checkUser = await _tagRepo.CheckUser(reqAddTagItemHandler.ItemId, reqAddTagItemHandler.UserId);
+            if (!checkUser)
             {
-                return Conflict(_statusMessage.TagJoinCheck());
+                return Unauthorized();
             }
-            bool addTags = await tagRepo.AddItemTagHandler(reqAddTagItemHandler);
-                if (!addTags)
+            /*
+        bool check = await _tagRepo.CheckItemTagJoin(reqAddTagItemHandler);
+        if (check)
+        {
+            return Conflict(_statusMessage.TagJoinCheck());
+        }
+            */
+            ResIdTagName addTag = await _tagRepo.AddItemTagHandler(reqAddTagItemHandler);
+                if (addTag == null)
                 {
                     return BadRequest();
                 }
-                return NoContent();
+                return Ok(addTag);
             }
 
 
@@ -55,7 +65,7 @@ namespace user_stuff_share_app.Controllers.Tag_Controllers
                 return BadRequest();
             }
 
-            IEnumerable<ResTagId> getCollectTags = await tagRepo.GetItemTags(reqItemId);
+            IEnumerable<ResIdTagName> getCollectTags = await _tagRepo.GetItemTags(reqItemId);
             if (getCollectTags == null)
             {
                 return BadRequest();
@@ -71,8 +81,14 @@ namespace user_stuff_share_app.Controllers.Tag_Controllers
             {
                 return BadRequest();
             }
+            reqRemoveItemTag.UserId = _userInfo.IdClaim(User);
+            bool checkUser = await _tagRepo.CheckUser(reqRemoveItemTag.ItemId, reqRemoveItemTag.UserId);
+            if (!checkUser)
+            {
+                return Unauthorized();
+            }
 
-            bool getCollectTags = await tagRepo.RemoveItemTagJoin(reqRemoveItemTag);
+            bool getCollectTags = await _tagRepo.RemoveItemTagJoin(reqRemoveItemTag);
             if (!getCollectTags)
             {
                 return BadRequest();

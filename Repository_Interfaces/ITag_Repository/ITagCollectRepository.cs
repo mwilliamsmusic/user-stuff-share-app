@@ -8,9 +8,10 @@ namespace user_stuff_share_app.Repository_Interfaces.ITag_Repository
 {
     public interface ITagCollectRepository
     {
-        Task<IEnumerable<ResTagId>> GetCollectTags(ReqCollectId reqCollectId);
-        Task<bool> AddTagCollectHandler(ReqAddTagCollectHandler reqAddTagCollectHandler);
+        Task<IEnumerable<ResIdTagName>> GetCollectTags(ReqCollectId reqCollectId);
+        Task<ResIdTagName> AddTagCollectHandler(ReqAddTagCollectHandler reqAddTagCollectHandler);
         Task<bool> RemoveTagCollectJoin(ReqRemoveCollectTag reqRemoveCollectTag);
         Task<bool> CheckCollectTagJoin(ReqAddTagCollectHandler reqAddTagCollectHandler);
+        Task<bool> CheckUser(long id, long userId);
     }
 }

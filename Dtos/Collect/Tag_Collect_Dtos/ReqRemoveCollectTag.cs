@@ -7,7 +7,8 @@ namespace user_stuff_share_app.Dtos.Collect.Tag_Collect_Dtos
 {
     public class ReqRemoveCollectTag
     {
-        public string TagName { get; set; }
+        public long Id { get; set; }
         public long CollectId { get; set; }
+        public long UserId { get; set; }
     }
 }

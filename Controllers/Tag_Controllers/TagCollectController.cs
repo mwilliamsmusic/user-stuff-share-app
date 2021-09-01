@@ -15,12 +15,14 @@ namespace user_stuff_share_app.Controllers.Tag_controllers
     [ApiController]
     public class TagCollectController : ControllerBase
     {
-        private readonly ITagCollectRepository tagRepo;
+        private readonly ITagCollectRepository _tagRepo;
         private readonly StatusMessages _statusMessages;
-        public TagCollectController(ITagCollectRepository tagRepo, StatusMessages statusMessaages)
+        private readonly UserInfo _userInfo;
+        public TagCollectController(ITagCollectRepository tagRepo, StatusMessages statusMessaages,  UserInfo userInfo)
         {
-            this.tagRepo = tagRepo;
+            _tagRepo = tagRepo;
             _statusMessages = statusMessaages;
+            _userInfo = userInfo;
         }
 
         [HttpPost("act")]
@@ -30,17 +32,20 @@ namespace user_stuff_share_app.Controllers.Tag_controllers
             {
                 return BadRequest();
             }
-            bool check =await  tagRepo.CheckCollectTagJoin(reqAddTagCollectHandler);
-            if (check)
+
+            reqAddTagCollectHandler.UserId = _userInfo.IdClaim(User);
+            bool checkUser = await _tagRepo.CheckUser(reqAddTagCollectHandler.CollectId, reqAddTagCollectHandler.UserId);
+            if (!checkUser)
             {
-                return Conflict(_statusMessages.TagJoinCheck());
+                return Unauthorized();
             }
-            bool addTags = await tagRepo.AddTagCollectHandler(reqAddTagCollectHandler);
-            if (!addTags)
+      
+            ResIdTagName addTag = await _tagRepo.AddTagCollectHandler(reqAddTagCollectHandler);
+            if (addTag == null)
             {
                 return BadRequest();
             }
-            return NoContent();
+            return Ok(addTag);
         }
 
         [HttpPost("gct")]
@@ -52,7 +57,7 @@ namespace user_stuff_share_app.Controllers.Tag_controllers
                 return BadRequest();
             }
 
-           IEnumerable<ResTagId>  getCollectTags = await tagRepo.GetCollectTags(reqCollectId);
+           IEnumerable<ResIdTagName>  getCollectTags = await _tagRepo.GetCollectTags(reqCollectId);
             if (getCollectTags == null)
             {
                 return BadRequest();
@@ -61,7 +66,7 @@ namespace user_stuff_share_app.Controllers.Tag_controllers
         }
 
 
-        [HttpPost("dct")]
+        [HttpPost("rct")]
         public async Task<IActionResult> RemoveCollectTag([FromBody] ReqRemoveCollectTag reqRemoveCollectTag)
         {
             if (reqRemoveCollectTag == null)
@@ -69,7 +74,14 @@ namespace user_stuff_share_app.Controllers.Tag_controllers
                 return BadRequest();
             }
 
-            bool getCollectTags = await tagRepo.RemoveTagCollectJoin(reqRemoveCollectTag);
+            reqRemoveCollectTag.UserId = _userInfo.IdClaim(User);
+            bool checkUser = await _tagRepo.CheckUser(reqRemoveCollectTag.CollectId, reqRemoveCollectTag.UserId);
+            if (!checkUser)
+            {
+                return Unauthorized();
+            }
+
+            bool getCollectTags = await _tagRepo.RemoveTagCollectJoin(reqRemoveCollectTag);
             if (!getCollectTags)
             {
                 return BadRequest();
