@@ -31,5 +31,11 @@ namespace user_stuff_share_app.Status_Messages
         {
             return new ResStatusMessage() { Message = "Tag already exists." };
         }
+
+        // Cool
+        public ResStatusMessage TagAlreadyCool()
+        {
+            return new ResStatusMessage() { Message = "Already been cooled." };
+        }
     }
 }

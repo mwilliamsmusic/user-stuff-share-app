@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using ssa_database.Models.User_Models;
 using System.Threading.Tasks;
 using user_stuff_share_app.Dtos.Follow_Dtos;
@@ -16,18 +17,19 @@ namespace user_stuff_share_app.Repository.Follow_Repository
             _mapper = mapper;
         }
 
-        public async Task<bool> AddFollow(ReqFollowUser reqUserFollow)
+        public async Task<bool> AddFollow(ReqFollowUser reqFollowUser)
         {
-            FollowUser addFollow = _mapper.Map<FollowUser>(reqUserFollow);
+            FollowUser addFollow = _mapper.Map<FollowUser>(reqFollowUser);
             await _db.FollowUser.AddAsync(addFollow);
             return await Save();
         }
-        public async Task<bool> RemoveFollow(ReqFollowUser reqUserFollow)
+        public async Task<bool> RemoveFollow(ReqFollowUser reqFollowUser)
         {
-            FollowUser removeFollow = _mapper.Map<FollowUser>(reqUserFollow);
-           _db.FollowUser.Remove(removeFollow);
+            FollowUser followCollect = await _db.FollowUser.AsNoTracking()
+                .FirstOrDefaultAsync(c => c.UserId == reqFollowUser.UserId && c.FollowUserId == reqFollowUser.FollowUserId);
+            _db.FollowUser.Remove(followCollect);
             return await Save();
-    }
+        }
 
         public async Task<bool> Save()
         {

@@ -38,14 +38,15 @@ namespace user_stuff_share_app.Repository.Cool_Repository
 
         public async Task<bool> UpdateValueCoolCollect(ReqUpdateCoolCollect reqUpdateCool)
         {
-            CoolCollect cool = await _dbCool.CoolCollect.AsNoTracking().FirstOrDefaultAsync(c => c.Id == reqUpdateCool.Id && c.CollectId == reqUpdateCool.CollectId);
-            if (cool != null)
-            {
+            CoolCollect cool = await _dbCool.CoolCollect.FirstOrDefaultAsync(c => c.Id == reqUpdateCool.Id && c.CollectId == reqUpdateCool.CollectId);
+            
+            
                 cool.Value = cool.Value + 1;
-                _dbCool.Update(cool);
-                return await SaveCoolCollect();
-            }
-            return false;
+            _dbCool.Entry(cool).State = EntityState.Modified;
+            //    _dbCool.Update(cool);
+            return await SaveCoolCollect();
+            
+
         }
 
         public async Task<bool> AddCoolUser(ReqCreateCoolJoin reqCreateCoolJoin)
@@ -56,9 +57,9 @@ namespace user_stuff_share_app.Repository.Cool_Repository
 
         }
 
-        public async Task<bool> CoolUserExists(long userId)
+        public async Task<bool> CoolUserExists(ReqUpdateCoolCollect reqUpdateCoolCollect)
         {
-            return await _dbJoin.CoolCollectJoin.AsNoTracking().AnyAsync(c => c.UserId == userId);
+            return await _dbJoin.CoolCollectJoin.AsNoTracking().AnyAsync(c => c.UserId == reqUpdateCoolCollect.UserId && c.CoolCollectId == reqUpdateCoolCollect.CollectId);
         }
 
 

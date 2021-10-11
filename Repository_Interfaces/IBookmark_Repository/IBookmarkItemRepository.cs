@@ -7,10 +7,9 @@ using user_stuff_share_app.Dtos.Basic_Req_Res_Dtos.Req;
 
 namespace user_stuff_share_app.Repository_Interfaces.IBookmark_Repository
 {
-    
-    public interface IBookmarkCollectRepository
+    public interface IBookmarkItemRepository
     {
-        Task<bool> AddBookmark(BookmarkCollect bookmarkCollect);
+        Task<bool> AddBookmark(BookmarkItem bookmarkItem);
         Task<bool> RemoveBookmark(ReqIdUserId reqIdUserId);
         Task<bool> Save();
     }

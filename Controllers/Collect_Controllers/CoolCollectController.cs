@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using user_stuff_share_app.Dtos.Collect.Cool_Collect_Dtos.Create_Cool_Join;
 using user_stuff_share_app.Dtos.Collect.Cool_Collect_Dtos.Update_Cool_Collect;
 using user_stuff_share_app.Repository_Interfaces.ICool_Repository;
+using user_stuff_share_app.Status_Messages;
 
 namespace user_stuff_share_app.Controllers.Collect_Controllers
 {
-    [Route("user/cool/collect/")]
+    [Route("user/cool/collect")]
     [ApiController]
     [Authorize]
     public class CoolCollectController : ControllerBase
@@ -17,38 +18,50 @@ namespace user_stuff_share_app.Controllers.Collect_Controllers
         private readonly ApplicationDbContext _db;
         private readonly UserInfo _userInfo;
 
-        public CoolCollectController(ICoolCollectRepository coolCollectRepo, ApplicationDbContext db, UserInfo userInfo)
+        private readonly StatusMessages _statusMessages;
+
+
+
+
+        public CoolCollectController(ICoolCollectRepository coolCollectRepo, ApplicationDbContext db, UserInfo userInfo, StatusMessages statusMessages)
         {
             _coolCollectRepo = coolCollectRepo;
             _db = db;
             _userInfo = userInfo;
+            _statusMessages = statusMessages;
         }
         
 
         
         [HttpPost("up")]
-        public async Task<IActionResult> UpdateCool([FromBody]  ReqUpdateCoolCollect reqUpdateCool)
+        public async Task<IActionResult> UpdateCool([FromBody]  ReqUpdateCoolCollect reqUpdateCoolCollect)
         {
-            reqUpdateCool.UserId = _userInfo.IdClaim(User);
-            if (!String.IsNullOrEmpty(reqUpdateCool.ToString()))
+            reqUpdateCoolCollect.UserId = _userInfo.IdClaim(User);
+            /*
+            if (!String.IsNullOrEmpty(reqUpdateCoolCollect.ToString()))
             {
                 return Unauthorized();
             }
-              bool didVote = await _coolCollectRepo.CoolUserExists(reqUpdateCool.UserId);
+            */
+              bool didVote = await _coolCollectRepo.CoolUserExists(reqUpdateCoolCollect);
             if (!didVote)
             {
-                bool updateCool = await _coolCollectRepo.UpdateValueCoolCollect(reqUpdateCool);
+                bool updateCool = await _coolCollectRepo.UpdateValueCoolCollect(reqUpdateCoolCollect);
                 if (updateCool)
                 {
-                    ReqCreateCoolJoin join = new ReqCreateCoolJoin();
-                    join.CoolCollectId = reqUpdateCool.Id;
-                    join.UserId = reqUpdateCool.UserId;
-                  bool addJoin = await  _coolCollectRepo.AddCoolUser(join);
-                    return NoContent();
+                    ReqCreateCoolJoin join = new() { CollectId = reqUpdateCoolCollect.CollectId, UserId = reqUpdateCoolCollect.UserId, CoolCollectId = reqUpdateCoolCollect.Id };
+                    bool addJoin = await _coolCollectRepo.AddCoolUser(join);
+                    if (addJoin)
+                    {
+
+                        return NoContent();
+                    }
+                    return StatusCode(500);
                 }
-                return NotFound();
+                return Conflict(_statusMessages.TagAlreadyCool());
             }
             return NotFound();
+ }
         }
     }
-}
+

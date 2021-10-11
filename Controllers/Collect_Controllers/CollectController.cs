@@ -67,7 +67,7 @@ namespace user_stuff_share_app.Controllers
                 return StatusCode(500, ModelState);
             }
 
-
+            /*
             ReqCreateCoolJoin reqCreateCoolJoin = new ReqCreateCoolJoin(){UserId = createCollect.UserId, CoolCollectId= createCool.Id, CollectId=createdCollect.Id };
             bool coolJoin = await coolCollectRepo.AddCoolUser( reqCreateCoolJoin);
             if (!coolJoin)
@@ -75,7 +75,7 @@ namespace user_stuff_share_app.Controllers
                 ModelState.AddModelError("", $"Something went wrong saving {createCollect.Title} item!");
                 return StatusCode(500, ModelState);
             }
-
+            */
             return Ok(createdCollect);
         }
     

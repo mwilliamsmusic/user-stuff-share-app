@@ -10,7 +10,7 @@ namespace user_stuff_share_app.Repository_Interfaces.ICool_Repository
     public interface ICoolCollectRepository
     {
         Task<ResId> CreateCoolCollect(ReqCreateCoolCollect reqCreateCool);
-        Task<bool> CoolUserExists(long userId);
+        Task<bool> CoolUserExists(ReqUpdateCoolCollect reqUpdateCoolCollect);
         Task<bool> UpdateValueCoolCollect(ReqUpdateCoolCollect reqUpdateCool);
         Task<bool> AddCoolUser(ReqCreateCoolJoin reqCreateCoolJoin);
     }

@@ -6,22 +6,21 @@ using user_stuff_share_app.Repository_Interfaces.IFollow_Repository;
 
 namespace user_stuff_share_app.Controllers.Follow_Controllers
 {
-    [Route("end/user/follow/")]
+    [Route("user/follow/")]
     [Authorize]
     [ApiController]
     public class FollowUserController : ControllerBase
     {
         private readonly IFollowUserRepository _followUserRepository;
-        private readonly ApplicationDbContext _db;
+
         private readonly UserInfo _userInfo;
-        public FollowUserController(ApplicationDbContext db, UserInfo userInfo, IFollowUserRepository followUserRepository)
+        public FollowUserController( UserInfo userInfo, IFollowUserRepository followUserRepository)
         {
-            _db = db;
             _userInfo = userInfo;
             _followUserRepository = followUserRepository;
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> CreateFollow([FromBody] ReqFollowUser reqFollowUser)
         {
 
