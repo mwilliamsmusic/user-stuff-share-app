@@ -1,3 +1,4 @@
+using MailKit.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,8 +7,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
 using System.Threading.Tasks;
+using user_stuff_share_app.Email;
 using user_stuff_share_app.Mappings;
 using user_stuff_share_app.Repository.Bookmark_Repository;
 using user_stuff_share_app.Repository.Collect_Repository;
@@ -48,13 +51,24 @@ namespace user_stuff_share_app
             services.AddScoped<IBookmarkItemRepository, BookmarkItemRepository>();
             services.AddScoped<IBookmarkCollectRepository, BookmarkCollectRepository>();
             services.AddScoped<IFollowUserRepository, FollowUserRepository>();
+            services.AddTransient<IEmailRepository, EmailRpository>();
             services.AddSingleton<UserInfo>();
             services.AddSingleton<StatusMessages>();
             services.AddAutoMapper(typeof(SSAMappings));
             services.AddControllers();
 
-
-
+            // Email Settings
+        
+            services.Configure<MailKitEmailSenderOptions>(options =>
+            {
+                options.Host_Address = Configuration["MailKit:SMTP:Address"];
+                options.Host_Port = Convert.ToInt32(Configuration["MailKit:SMTP:Port"]);
+                options.Host_Username = Configuration["MailKit:SMTP:Account"];
+                options.Host_Password = Configuration["MailKit:SMTP:Password"];
+                options.Sender_EMail = Configuration["MailKit:SMTP:SenderEmail"];
+                options.Sender_Name = Configuration["MailKit:SMTP:SenderName"];
+                options.Host_SecureSocketOptions = SecureSocketOptions.SslOnConnect;
+            });
 
             var appSettingsSection = Configuration.GetSection("AppSettings");
 
