@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using user_stuff_share_app;
@@ -9,9 +10,10 @@ using user_stuff_share_app;
 namespace user_stuff_share_app.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211027165025_RestModelDBPass")]
+    partial class RestModelDBPass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -301,86 +303,6 @@ namespace user_stuff_share_app.Migrations
                     b.ToTable("reset");
                 });
 
-            modelBuilder.Entity("ssa_database.Models.Flag_Models.CollectFlag", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<long>("CollectId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("collect_id");
-
-                    b.Property<string>("Rating")
-                        .HasColumnType("text")
-                        .HasColumnName("rating");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("text")
-                        .HasColumnName("reason");
-
-                    b.Property<string>("Url")
-                        .HasColumnType("text")
-                        .HasColumnName("url");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_collect_flag");
-
-                    b.HasIndex("CollectId")
-                        .HasDatabaseName("ix_collect_flag_collect_id");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_collect_flag_user_id");
-
-                    b.ToTable("collect_flag");
-                });
-
-            modelBuilder.Entity("ssa_database.Models.Flag_Models.ItemFlag", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<long>("ItemId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("item_id");
-
-                    b.Property<string>("Rating")
-                        .HasColumnType("text")
-                        .HasColumnName("rating");
-
-                    b.Property<string>("Reason")
-                        .HasColumnType("text")
-                        .HasColumnName("reason");
-
-                    b.Property<string>("Url")
-                        .HasColumnType("text")
-                        .HasColumnName("url");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_item_flag");
-
-                    b.HasIndex("ItemId")
-                        .HasDatabaseName("ix_item_flag_item_id");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_item_flag_user_id");
-
-                    b.ToTable("item_flag");
-                });
-
             modelBuilder.Entity("ssa_database.Models.Tag_Models.Tag", b =>
                 {
                     b.Property<string>("Name")
@@ -546,7 +468,7 @@ namespace user_stuff_share_app.Migrations
             modelBuilder.Entity("ssa_database.Models.Collect_Models.Collect", b =>
                 {
                     b.HasOne("ssa_database.Models.User_Models.User", "User")
-                        .WithMany("Collects")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .HasConstraintName("fk_collect_user_user_id")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -625,48 +547,6 @@ namespace user_stuff_share_app.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ssa_database.Models.Flag_Models.CollectFlag", b =>
-                {
-                    b.HasOne("ssa_database.Models.Collect_Models.Collect", "Collect")
-                        .WithMany("CollectFlags")
-                        .HasForeignKey("CollectId")
-                        .HasConstraintName("fk_collect_flag_collect_collect_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ssa_database.Models.User_Models.User", "User")
-                        .WithMany("CollectFlags")
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("fk_collect_flag_user_user_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Collect");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ssa_database.Models.Flag_Models.ItemFlag", b =>
-                {
-                    b.HasOne("ssa_database.Models.Collect_Models.Item", "Item")
-                        .WithMany("ItemFlags")
-                        .HasForeignKey("ItemId")
-                        .HasConstraintName("fk_item_flag_item_item_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ssa_database.Models.User_Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("fk_item_flag_user_user_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Item");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ssa_database.Models.Tag_Models.TagCollectJoin", b =>
                 {
                     b.HasOne("ssa_database.Models.Collect_Models.Collect", "Collect")
@@ -710,8 +590,6 @@ namespace user_stuff_share_app.Migrations
                 {
                     b.Navigation("BookmarkCollects");
 
-                    b.Navigation("CollectFlags");
-
                     b.Navigation("CoolCollects");
 
                     b.Navigation("TagCollectJoins");
@@ -722,8 +600,6 @@ namespace user_stuff_share_app.Migrations
                     b.Navigation("BookmarkItems");
 
                     b.Navigation("CoolItems");
-
-                    b.Navigation("ItemFlags");
 
                     b.Navigation("TagItemJoins");
                 });
@@ -748,10 +624,6 @@ namespace user_stuff_share_app.Migrations
                     b.Navigation("BookmarkCollects");
 
                     b.Navigation("BookmarkItems");
-
-                    b.Navigation("CollectFlags");
-
-                    b.Navigation("Collects");
 
                     b.Navigation("CoolCollectJoins");
 

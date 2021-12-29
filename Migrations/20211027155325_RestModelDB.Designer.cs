@@ -10,15 +10,15 @@ using user_stuff_share_app;
 namespace user_stuff_share_app.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210831035321_gah")]
-    partial class gah
+    [Migration("20211027155325_RestModelDB")]
+    partial class RestModelDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.9")
+                .HasAnnotation("ProductVersion", "5.0.11")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             modelBuilder.Entity("ssa_database.Models.Bookmark_Models.BookmarkCollect", b =>
@@ -275,6 +275,28 @@ namespace user_stuff_share_app.Migrations
                         .HasDatabaseName("ix_cool_item_join_user_id");
 
                     b.ToTable("cool_item_join");
+                });
+
+            modelBuilder.Entity("ssa_database.Models.Email_Models.Reset", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text")
+                        .HasColumnName("email");
+
+                    b.HasKey("Id")
+                        .HasName("pk_reset");
+
+                    b.ToTable("reset");
                 });
 
             modelBuilder.Entity("ssa_database.Models.Tag_Models.Tag", b =>

@@ -4,10 +4,24 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace user_stuff_share_app.Migrations
 {
-    public partial class gah : Migration
+    public partial class RestModelDB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "reset",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    email = table.Column<string>(type: "text", nullable: true),
+                    created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_reset", x => x.id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "tag",
                 columns: table => new
@@ -394,6 +408,9 @@ namespace user_stuff_share_app.Migrations
 
             migrationBuilder.DropTable(
                 name: "follow_user");
+
+            migrationBuilder.DropTable(
+                name: "reset");
 
             migrationBuilder.DropTable(
                 name: "tag_collect_join");

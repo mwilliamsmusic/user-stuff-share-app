@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using ssa_database.Models.Bookmark_Models;
 using ssa_database.Models.Collect_Models;
 using ssa_database.Models.Cool_Models;
+using ssa_database.Models.Email_Models;
+using ssa_database.Models.Flag_Models;
 using ssa_database.Models.Tag_Models;
 using ssa_database.Models.User_Models;
 using System.Reflection;
@@ -25,7 +27,9 @@ namespace user_stuff_share_app
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
         public DbSet<Collect> Collect { get; set; }
-
+        public DbSet<ItemFlag> ItemFlag { get; set; }
+        public DbSet<CollectFlag> CollectFlag { get; set; }
+        public DbSet<Reset> Reset { get; set; }
         public DbSet<Item> Item { get; set; }
         public DbSet<CoolCollect> CoolCollect{ get; set; }
         public DbSet<CoolCollectJoin> CoolCollectJoin { get; set; }

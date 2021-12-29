@@ -19,10 +19,10 @@ namespace user_stuff_share_app.Repository.User_Repository
         private readonly ApplicationDbContext _db;
         private readonly AppSettings _appSettings;
 
-        public UserRepository(ApplicationDbContext db, IOptions<AppSettings> appsettings)
+        public UserRepository(ApplicationDbContext db, IOptions<AppSettings> appSettings)
         {
             _db = db;
-            _appSettings = appsettings.Value;
+            _appSettings = appSettings.Value;
         }
         
      

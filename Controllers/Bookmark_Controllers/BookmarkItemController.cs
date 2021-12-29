@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ssa_database.Models.Bookmark_Models;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using user_stuff_share_app.Repository_Interfaces.IBookmark_Repository;
 
 namespace user_stuff_share_app.Controllers.Bookmark_Controllers
 {
+    [Authorize]
     [Route("user/bookmark/item/")]
     [ApiController]
     public class BookmarkItemController:ControllerBase
